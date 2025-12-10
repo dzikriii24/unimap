@@ -1,0 +1,7 @@
+# Hapus file .env
+rm lib/.env
+
+# Update .gitignore untuk tidak include credentials
+echo "
+# Supabase credentials
+lib/core/services/supabase_service.dart" >> .gitignore

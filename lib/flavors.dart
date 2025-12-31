@@ -3,17 +3,17 @@ abstract class FlavorConfig {
   
   static String get supabaseUrl {
     if (isProduction) {
-      return const String.fromEnvironment('SUPABASE_URL');
+      return const String.fromEnvironment('https://gyljffqwaahfiagstjzh.supabase.co');
     } else {
-      return 'https://YOUR_PROJECT_ID.supabase.co';
+      return 'https://gyljffqwaahfiagstjzh.supabase.co';
     }
   }
   
   static String get supabaseAnonKey {
     if (isProduction) {
-      return const String.fromEnvironment('SUPABASE_ANON_KEY');
+      return const String.fromEnvironment('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bGpmZnF3YWFoZmlhZ3N0anpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNDk3MzYsImV4cCI6MjA4MDkyNTczNn0.qwwRvwNXgA7Oo8wa_6FATMJpFV5KsARCNE3AIlmnss8');
     } else {
-      return 'YOUR_ANON_KEY';
+      return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5bGpmZnF3YWFoZmlhZ3N0anpoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNDk3MzYsImV4cCI6MjA4MDkyNTczNn0.qwwRvwNXgA7Oo8wa_6FATMJpFV5KsARCNE3AIlmnss8';
     }
   }
 }

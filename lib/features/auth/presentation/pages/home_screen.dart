@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:unicamp/core/models/spot_model.dart';
 import 'package:unicamp/core/theme/app_theme.dart';
+import 'package:unicamp/features/maps/map.dart';
+import 'package:unicamp/features/profile/profile_screen.dart';
+import 'package:unicamp/presentation/pages/category_result_screen.dart';
+import 'package:unicamp/presentation/pages/QuickListScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,14 +15,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   static const List<Widget> _pages = [
+    MapScreen(),
     HomePage(),
-    PlaceholderWidget(title: 'Maps'),
-    PlaceholderWidget(title: 'Favorites'),
-    PlaceholderWidget(title: 'Notifications'),
-    PlaceholderWidget(title: 'Profile'),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -29,37 +32,53 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppTheme.primaryColor,
-        unselectedItemColor: AppTheme.textSecondary,
-        selectedLabelStyle: GoogleFonts.inter(fontSize: 12),
-        unselectedLabelStyle: GoogleFonts.inter(fontSize: 12),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: AppTheme.primaryColor,
+          unselectedItemColor: Colors.grey.shade400,
+          showUnselectedLabels: true,
+          selectedLabelStyle: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Maps',
+          unselectedLabelStyle: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Alerts',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.map_outlined),
+              activeIcon: Icon(Icons.map),
+              label: 'Peta',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Beranda',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profil',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -68,305 +87,889 @@ class _HomeScreenState extends State<HomeScreen> {
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  void _navigateToCategory(BuildContext context, SpotCategory category) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CategoryResultScreen(category: category),
+      ),
+    );
+  }
+
+  void _performSearch(BuildContext context, String query) {
+    if (query.trim().isEmpty) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CategoryResultScreen(initialSearchQuery: query),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Hello, Student!',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: AppTheme.textSecondary,
-              ),
-            ),
-            Text(
-              'University of Indonesia',
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        physics: const BouncingScrollPhysics(),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Bar
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 16),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search for spots, rooms, facilities...',
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                ),
-              ),
-            ),
-
-            // Quick Stats
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildStat('24', 'Open Spots'),
-                  _buildStat('156', 'Total Spots'),
-                  _buildStat('3', 'Events'),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Categories
-            Text(
-              'Categories',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.9,
-              ),
-              itemCount: 8,
-              itemBuilder: (context, index) {
-                final categories = [
-                  {'icon': Icons.school, 'label': 'Class', 'color': Color(0xFF4CAF50)},
-                  {'icon': Icons.restaurant, 'label': 'Food', 'color': Color(0xFFF44336)},
-                  {'icon': Icons.wifi, 'label': 'WiFi', 'color': Color(0xFF2196F3)},
-                  {'icon': Icons.sports_basketball, 'label': 'Sports', 'color': Color(0xFFFF9800)},
-                  {'icon': Icons.local_library, 'label': 'Library', 'color': Color(0xFF9C27B0)},
-                  {'icon': Icons.science, 'label': 'Lab', 'color': Color(0xFF009688)},
-                  {'icon': Icons.local_parking, 'label': 'Parking', 'color': Color(0xFF795548)},
-                  {'icon': Icons.more_horiz, 'label': 'More', 'color': Color(0xFF9E9E9E)},
-                ];
-                
-                final category = categories[index];
-                return Column(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: category['color'] as Color,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        category['icon'] as IconData,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      category['label'] as String,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 24),
-
-            // Popular Spots
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // ================= ENHANCED BANNER SECTION =================
+            Stack(
               children: [
-                Text(
-                  'Popular Spots',
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                // Banner Image dari assets lokal
+                Container(
+                  height: 320,
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/banner.png'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'See All',
-                    style: GoogleFonts.inter(
-                      color: AppTheme.primaryColor,
+
+                // Gradient Overlay
+                Container(
+                  height: 320,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.4),
+                        Colors.black.withOpacity(0.7),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Konten Banner
+                Positioned(
+                  bottom: 40,
+                  left: 24,
+                  right: 24,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Kampus Utama',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        "Temukan Fasilitas\nKampus dengan Mudah",
+                        style: GoogleFonts.inter(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Jelajahi semua fasilitas yang tersedia di lingkungan kampus",
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Stats Info
+                Positioned(
+                  top: 50,
+                  left: 0,
+                  right: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem("50+", "Fasilitas"),
+                          Container(
+                            height: 30,
+                            width: 1,
+                            color: Colors.grey.shade200,
+                          ),
+                          _buildStatItem("24/7", "Akses"),
+                          Container(
+                            height: 30,
+                            width: 1,
+                            color: Colors.grey.shade200,
+                          ),
+                          _buildStatItem("100%", "Akurat"),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(
-              height: 180,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return Container(
-                    width: 280,
-                    margin: const EdgeInsets.only(right: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+
+            // ================= ENHANCED SEARCH BAR =================
+            Transform.translate(
+              offset: const Offset(0, -20),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 25,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (value) => _performSearch(context, value),
+                  decoration: InputDecoration(
+                    hintText: 'Cari gedung, kantin, fasilitas...',
+                    hintStyle: GoogleFonts.inter(
+                      color: Colors.grey.shade400,
+                      fontSize: 14,
+                    ),
+                    prefixIcon: Container(
+                      margin: const EdgeInsets.all(12),
+                      child: const Icon(
+                        Icons.search_rounded,
+                        color: AppTheme.primaryColor,
+                        size: 24,
+                      ),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(
+                        Icons.mic_none_rounded,
+                        color: AppTheme.primaryColor,
+                      ),
+                      onPressed: () {},
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ================= QUICK ACTIONS =================
+// ================= QUICK ACTIONS =================
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 24), // 24 lebih pas daripada 40
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start, // Biar rapi atasnya
+                children: [
+                  _buildQuickAction(
+                    context, // ✅ JANGAN LUPA TAMBAH INI
+                    Icons.near_me_rounded, // Pakai rounded biar smooth
+                    'Dekat Saya',
+                    Colors.blue.shade50,
+                    Colors.blue,
+                  ),
+                  _buildQuickAction(
+                    context, // ✅ TAMBAH INI
+                    Icons.favorite_rounded,
+                    'Favorit',
+                    Colors.pink.shade50,
+                    Colors.pink,
+                  ),
+                  _buildQuickAction(
+                    context, // ✅ TAMBAH INI
+                    Icons.trending_up_rounded,
+                    'Populer',
+                    Colors.green.shade50,
+                    Colors.green,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ================= CATEGORIES SECTION =================
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Kategori Fasilitas',
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Lihat Semua',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: AppTheme.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ENHANCED GRID CATEGORIES
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.85,
+                    children: [
+                      _buildCategoryCard(
+                        context,
+                        Icons.apartment,
+                        'Gedung',
+                        SpotCategory.building,
+                        const Color(0xFF4FC3F7),
+                        'Ruangan Kuliah & Lab',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        Icons.wifi,
+                        'WiFi',
+                        SpotCategory.wifi,
+                        const Color(0xFF7986CB),
+                        'Hotspot Area',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        Icons.restaurant,
+                        'Kantin',
+                        SpotCategory.canteen,
+                        const Color(0xFFFF8A65),
+                        'Tempat Makan',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        Icons.mosque,
+                        'Masjid',
+                        SpotCategory.mosque,
+                        const Color(0xFF81C784),
+                        'Ibadah',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        Icons.local_convenience_store,
+                        'Mart',
+                        SpotCategory.minimarket,
+                        const Color(0xFFF06292),
+                        'Kebutuhan',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        Icons.print,
+                        'Fotokopi',
+                        SpotCategory.photocopy,
+                        const Color(0xFF90A4AE),
+                        'Print & Scan',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        Icons.local_parking,
+                        'Parkir',
+                        SpotCategory.parking,
+                        const Color(0xFF4DB6AC),
+                        'Area Parkir',
+                      ),
+                      _buildCategoryCard(
+                        context,
+                        Icons.sports_basketball,
+                        'Olahraga',
+                        SpotCategory.sports,
+                        const Color(0xFFFF9800),
+                        'Lapangan & Gym',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ================= FEATURED SECTION =================
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppTheme.primaryColor.withOpacity(0.1),
+                    Colors.blue.shade50,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.primaryColor.withOpacity(0.3),
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.star_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Fasilitas Unggulan',
+                              style: GoogleFonts.inter(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textPrimary,
+                              ),
+                            ),
+                            Text(
+                              'Tempat yang sering dikunjungi',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: AppTheme.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: AppTheme.primaryColor,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildFeaturedItem(
+                          'Perpustakaan Pusat',
+                          'Lantai 3 Gedung A',
+                          Icons.library_books,
+                        ),
+                        const SizedBox(width: 12),
+                        _buildFeaturedItem(
+                          'Kantin Utama',
+                          'Makanan & Minuman',
+                          Icons.restaurant_menu,
+                        ),
+                        const SizedBox(width: 12),
+                        _buildFeaturedItem(
+                          'Lab Komputer',
+                          'Gedung Teknik',
+                          Icons.computer,
                         ),
                       ],
                     ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ================= MAP CARD SECTION =================
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF6366F1),
+                    const Color(0xFF8B5CF6),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6366F1).withOpacity(0.3),
+                    blurRadius: 25,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(16),
-                              topRight: Radius.circular(16),
-                            ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
                           ),
-                          child: Center(
-                            child: Icon(
-                              Icons.location_on,
-                              size: 40,
-                              color: Colors.grey.shade400,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            'NEW',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                        Padding(
+                        const SizedBox(height: 12),
+                        Text(
+                          'Jelajahi Peta\nKampus Interaktif',
+                          style: GoogleFonts.inter(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Lihat lokasi real-time dengan navigasi step-by-step',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const MapScreen(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppTheme.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Buka Peta',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward_rounded, size: 18),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Icon(
+                      Icons.map_rounded,
+                      color: Colors.white,
+                      size: 60,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ================= TIPS SECTION =================
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tips Hari Ini',
+                    style: GoogleFonts.inter(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
                           padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.shade100,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.lightbulb_outline,
+                            color: Colors.amber,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Main Library',
+                                'Gunakan WiFi Kampus',
                                 style: GoogleFonts.inter(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
+                                  color: AppTheme.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Open until 21:00 • 2.4km',
+                                'Akses internet gratis di area hotspot dengan akun kampus Anda',
                                 style: GoogleFonts.inter(
-                                  fontSize: 12,
+                                  fontSize: 13,
                                   color: AppTheme.textSecondary,
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Icon(Icons.star, size: 16, color: Colors.amber),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '4.8',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Icon(Icons.wifi, size: 16, color: Colors.green),
-                                  const SizedBox(width: 8),
-                                  Icon(Icons.ac_unit, size: 16, color: Colors.blue),
-                                ],
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStat(String value, String label) {
+  Widget _buildStatItem(String value, String label) {
     return Column(
       children: [
         Text(
           value,
           style: GoogleFonts.inter(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
             color: AppTheme.primaryColor,
           ),
         ),
+        const SizedBox(height: 4),
         Text(
           label,
           style: GoogleFonts.inter(
             fontSize: 12,
-            color: AppTheme.textSecondary,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
   }
-}
 
-class PlaceholderWidget extends StatelessWidget {
-  final String title;
+  // Widget Helper untuk Tombol Quick Action
+  Widget _buildQuickAction(
+    BuildContext context, // ✅ Tambah parameter Context
+    IconData icon,
+    String label,
+    Color bg,
+    Color iconColor,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        // ✅ LOGIKA NAVIGASI OTOMATIS
+        QuickListType type;
 
-  const PlaceholderWidget({super.key, required this.title});
+        // Tentukan tipe berdasarkan Label teks
+        if (label == 'Favorit') {
+          type = QuickListType.favorite;
+        } else if (label == 'Populer') {
+          type = QuickListType.popular;
+        } else {
+          // Default ke Dekat Saya
+          type = QuickListType.nearby;
+        }
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.construction,
-            size: 64,
-            color: Colors.grey.shade300,
+        // Buka Halaman QuickListScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => QuickListScreen(type: type),
           ),
-          const SizedBox(height: 16),
-          Text(
-            '$title Page\nComing Soon',
-            style: GoogleFonts.inter(
-              fontSize: 20,
-              color: Colors.grey.shade400,
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(
+                16), // Padding diperbesar dikit biar enak ditekan
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(20), // Lebih bulat (Modern)
+              boxShadow: [
+                BoxShadow(
+                  color: bg.withOpacity(0.5),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
+            child: Icon(icon, color: iconColor, size: 28),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(
+    BuildContext context,
+    IconData icon,
+    String label,
+    SpotCategory category,
+    Color color,
+    String description,
+  ) {
+    return GestureDetector(
+      onTap: () => _navigateToCategory(context, category),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      color.withOpacity(0.2),
+                      color.withOpacity(0.1),
+                    ]),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: GoogleFonts.inter(
+                fontSize: 9,
+                color: Colors.grey.shade500,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeaturedItem(String title, String subtitle, IconData icon) {
+    return Container(
+      width: 200,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: AppTheme.primaryColor,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: AppTheme.textSecondary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),

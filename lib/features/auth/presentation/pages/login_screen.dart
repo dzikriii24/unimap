@@ -225,37 +225,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.w400,
                       ),
                     ).animate().fadeIn(delay: 400.ms),
-                    
-                    // Stats
-                    Container(
-                      margin: const EdgeInsets.only(top: 32),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatItem('1,000+', 'Pengguna'),
-                          Container(
-                            height: 20,
-                            width: 1,
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                          _buildStatItem('50+', 'Fasilitas'),
-                          Container(
-                            height: 20,
-                            width: 1,
-                            color: Colors.white.withOpacity(0.3),
-                          ),
-                          _buildStatItem('24/7', 'Akses'),
-                        ],
-                      ),
-                    ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.5, end: 0),
                   ],
                 ),
               ),

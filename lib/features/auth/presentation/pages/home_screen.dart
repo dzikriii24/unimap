@@ -189,7 +189,7 @@ class HomePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        "Temukan Fasilitas\nKampus dengan Mudah",
+                        "Temukan Fasilitas\nKampus",
                         style: GoogleFonts.inter(
                           fontSize: 32,
                           fontWeight: FontWeight.w800,
@@ -207,48 +207,6 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ),
-                ),
-
-                // Stats Info
-                Positioned(
-                  top: 50,
-                  left: 0,
-                  right: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatItem("50+", "Fasilitas"),
-                          Container(
-                            height: 30,
-                            width: 1,
-                            color: Colors.grey.shade200,
-                          ),
-                          _buildStatItem("24/7", "Akses"),
-                          Container(
-                            height: 30,
-                            width: 1,
-                            color: Colors.grey.shade200,
-                          ),
-                          _buildStatItem("100%", "Akurat"),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
               ],

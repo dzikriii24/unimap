@@ -17,7 +17,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingPage> _pages = [
     const OnboardingPage(
-      title: 'Temukan Spot Terbaik',
+      title: 'Temukan Spot',
       description: 'Cari ruang kuliah, kantin, WiFi, dan fasilitas kampus lainnya dengan mudah dan cepat',
       icon: Icons.explore_rounded,
       color: Color(0xFF6366F1),

@@ -36,7 +36,7 @@ class AppTheme {
       bodyColor: textPrimary,
       displayColor: textPrimary,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: cardColor,
       elevation: 1,
       shape: RoundedRectangleBorder(
